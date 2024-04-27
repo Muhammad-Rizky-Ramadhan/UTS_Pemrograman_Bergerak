@@ -42,7 +42,6 @@ public class MainActivity extends AppCompatActivity {
 
         apiService = ApiConfig.getApiService();
 
-
         btnSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -55,10 +54,8 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-
-
-
     }
+
     private void search(String search){
         Call<FindUsers> call = apiService.findUsers(search);
         call.enqueue(new Callback<FindUsers>() {

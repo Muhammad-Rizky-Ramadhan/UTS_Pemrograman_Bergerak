@@ -21,61 +21,71 @@ import retrofit2.Response;
 
 public class Detail extends AppCompatActivity {
     private ProgressBar progressBar;
+    private TextView textView, textView2, textView3;
+    private ImageView imageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.user_detail);
 
-        progressBar = findViewById(R.id.progressBar);
+        initializeViews();
 
         Bundle extras = getIntent().getExtras();
-        if (extras != null){
+        if (extras != null) {
             String username = extras.getString("username");
             ApiService apiService = ApiConfig.getApiService();
             Call<UserResponse> userCall = apiService.getUser(username);
-
-            TextView textView = findViewById(R.id.name_view);
-            TextView textView2 = findViewById(R.id.username_view);
-            TextView textView3 = findViewById(R.id.bio_view);
-            ImageView imageView = findViewById(R.id.profil_picture);
 
             showLoading(true);
             userCall.enqueue(new Callback<UserResponse>() {
                 @Override
                 public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
-                    if (response.isSuccessful()){
+                    if (response.isSuccessful()) {
                         showLoading(false);
                         UserResponse user = response.body();
-                        if (user != null){
-                            String name = "Name: " + user.getName();
-                            String usernames = "Username: " + user.getLogin();
-                            String bio = "Bio: " + user.getBio();
-                            String gambar = user.getAvatarUrl();
-
-                            textView.setText(name);
-                            textView2.setText(usernames);
-                            textView3.setText(bio);
-                            Picasso.get().load(gambar).into(imageView);
-                        }else {
-                            Toast.makeText(Detail.this, "Failed to get user data", Toast.LENGTH_SHORT).show();
+                        if (user != null) {
+                            populateUserData(user);
+                        } else {
+                            showToast("Failed to get user data");
                         }
                     }
                 }
 
                 @Override
                 public void onFailure(Call<UserResponse> call, Throwable t) {
-                    Toast.makeText(Detail.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                    showToast("Error: " + t.getMessage());
                 }
             });
         }
     }
 
-    private void showLoading(Boolean isLoading) {
-        if (isLoading) {
-            progressBar.setVisibility(View.VISIBLE);
-        } else {
-            progressBar.setVisibility(View.GONE);
-        }
+    private void initializeViews() {
+        progressBar = findViewById(R.id.progressBar);
+        textView = findViewById(R.id.name_view);
+        textView2 = findViewById(R.id.username_view);
+        textView3 = findViewById(R.id.bio_view);
+        imageView = findViewById(R.id.profil_picture);
+    }
+
+    private void populateUserData(UserResponse user) {
+        String name = "Name: " + user.getName();
+        String usernames = "Username: " + user.getLogin();
+        String bio = "Bio: " + user.getBio();
+        String gambar = user.getAvatarUrl();
+
+        textView.setText(name);
+        textView2.setText(usernames);
+        textView3.setText(bio);
+        Picasso.get().load(gambar).into(imageView);
+    }
+
+    private void showLoading(boolean isLoading) {
+        progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+    }
+
+    private void showToast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 }
+

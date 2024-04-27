@@ -33,17 +33,7 @@ public class UserResponseAdapter extends RecyclerView.Adapter<UserResponseAdapte
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         UserResponse user = users.get(position);
-        holder.usernameTextView.setText(user.getLogin());
-        Picasso.get().load(user.getAvatarUrl()).into(holder.avatarImageView);
-
-        holder.itemView.setOnClickListener(click -> {
-            Intent intent = new Intent(click.getContext(), Detail.class);
-            intent.putExtra("nama", user.getName());
-            intent.putExtra("username", user.getLogin());
-            intent.putExtra("bio", user.getBio());
-            intent.putExtra("gambar", user.getAvatarUrl());
-            click.getContext().startActivity(intent);
-        });
+        holder.bind(user);
     }
 
     @Override
@@ -51,13 +41,31 @@ public class UserResponseAdapter extends RecyclerView.Adapter<UserResponseAdapte
         return users.size();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         ImageView avatarImageView;
         TextView usernameTextView;
+
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             avatarImageView = itemView.findViewById(R.id.profil_picture);
             usernameTextView = itemView.findViewById(R.id.username_view);
+            itemView.setOnClickListener(this);
+        }
+
+        public void bind(UserResponse user) {
+            usernameTextView.setText(user.getLogin());
+            Picasso.get().load(user.getAvatarUrl()).into(avatarImageView);
+        }
+
+        @Override
+        public void onClick(View v) {
+            UserResponse user = users.get(getAdapterPosition());
+            Intent intent = new Intent(v.getContext(), Detail.class);
+            intent.putExtra("nama", user.getName());
+            intent.putExtra("username", user.getLogin());
+            intent.putExtra("bio", user.getBio());
+            intent.putExtra("gambar", user.getAvatarUrl());
+            v.getContext().startActivity(intent);
         }
     }
 }
